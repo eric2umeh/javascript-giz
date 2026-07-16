@@ -1,7 +1,4 @@
-/* ==========================
-   General Styling
-========================== */
-
+/* General Styling */
 body {
   font-family: Arial, sans-serif;
   max-width: 700px;
@@ -13,9 +10,7 @@ h3 {
   text-align: center;
 }
 
-/* ==========================
-   Form
-========================== */
+/* Form */
 
 input,
 select,
@@ -28,9 +23,7 @@ button {
   cursor: pointer;
 }
 
-/* ==========================
-   Summary
-========================== */
+/* Summary */
 
 #income {
   color: green;
@@ -44,9 +37,7 @@ button {
   color: blue;
 }
 
-/* ==========================
-   Transaction List
-========================== */
+/* Transaction List */
 
 ul {
   list-style: none;
