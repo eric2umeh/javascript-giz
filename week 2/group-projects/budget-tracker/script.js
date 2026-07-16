@@ -56,7 +56,7 @@ function render() {
             ₦${entry.amount}
             (${entry.type})
             <br>
-            Category: ${entry.categorxy}
+            Category: ${entry.category}
 
             <button data-index="${index}">
                 Delete
