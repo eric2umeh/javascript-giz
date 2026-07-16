@@ -1,0 +1,22 @@
+body {
+  font-family: Arial;
+  max-width: 700px;
+  margin: 20px auto;
+}
+li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px;
+  border-bottom: 1px solid #ddd;
+}
+.grade-a {
+  background: #dcfce7;
+}
+
+.grade-c {
+  background: #fef9c3;
+}
+
+.grade-f {
+  background: #fee2e2;
+}

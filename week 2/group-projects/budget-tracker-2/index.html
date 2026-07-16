@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Budget Tracker</title>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <h2>💰 Budget Tracker</h2>
+
+    <!-- Add Transaction -->
+
+    <input id="desc" placeholder="Description" />
+
+    <input id="amount" type="number" placeholder="Amount" />
+
+    <select id="category">
+      <option>Food</option>
+      <option>Transport</option>
+      <option>Shopping</option>
+      <option>Salary</option>
+      <option>Rent</option>
+      <option>Other</option>
+    </select>
+
+    <select id="type">
+      <option>Income</option>
+      <option>Expense</option>
+    </select>
+
+    <button id="add">Add</button>
+
+    <br /><br />
+
+    <!-- Filter -->
+
+    <select id="filter">
+      <option>All</option>
+
+      <option>Income</option>
+
+      <option>Expense</option>
+    </select>
+
+    <h3 id="income"></h3>
+
+    <h3 id="expense"></h3>
+
+    <h3 id="balance"></h3>
+
+    <h3>Category Breakdown</h3>
+
+    <div id="categories"></div>
+
+    <hr />
+
+    <ul id="list"></ul>
+
+    <script src="script.js"></script>
+  </body>
+</html>

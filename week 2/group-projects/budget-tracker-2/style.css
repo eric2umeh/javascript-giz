@@ -1,0 +1,94 @@
+/* ==========================
+   General Styling
+========================== */
+
+body {
+  font-family: Arial, sans-serif;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+h2,
+h3 {
+  text-align: center;
+}
+
+/* ==========================
+   Form
+========================== */
+
+input,
+select,
+button {
+  padding: 8px;
+  margin: 5px;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* ==========================
+   Summary
+========================== */
+
+#income {
+  color: green;
+}
+
+#expense {
+  color: red;
+}
+
+#balance {
+  color: blue;
+}
+
+/* ==========================
+   Transaction List
+========================== */
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Income = Green */
+
+.Income {
+  background: #dcfce7;
+}
+
+/* Expense = Red */
+
+.Expense {
+  background: #fee2e2;
+}
+
+/* Category Breakdown */
+
+#categories p {
+  margin: 5px 0;
+}
+
+/* Delete Button */
+
+li button {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+}
+
+li button:hover {
+  background: darkred;
+}
