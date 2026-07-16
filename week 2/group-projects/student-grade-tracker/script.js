@@ -1,9 +1,10 @@
+// Tracks which student is being edited.
 let editIndex = -1;
 
 // Store all students
 const students = [];
 
-// Get HTML elements
+// Connects JavaScript to HTML
 const studentName = document.getElementById("studentName");
 const studentScore = document.getElementById("studentScore");
 const addBtn = document.getElementById("addBtn");
@@ -14,7 +15,7 @@ const totalStudents = document.getElementById("totalStudents");
 const averageScore = document.getElementById("averageScore");
 const topStudent = document.getElementById("topStudent");
 
-// Calculate Grade
+// Calculate Grade - Converts scores to grades.
 function grade(score) {
   if (score >= 70) return "A";
   if (score >= 60) return "B";
@@ -24,7 +25,7 @@ function grade(score) {
   return "F";
 }
 
-// Display Students
+// Display Students & Refreshes the table
 function render() {
   studentTable.innerHTML = "";
 
@@ -40,12 +41,15 @@ function render() {
     return;
   }
 
+  // Loops through students.
   students.forEach((student, index) => {
+    // Creates HTML elements
     const row = document.createElement("tr");
 
     const studentGrade = grade(student.score);
 
     if (studentGrade === "A" || studentGrade === "B") {
+      // Adds row colors.
       row.classList.add("grade-a");
     } else if (studentGrade === "C" || studentGrade === "D") {
       row.classList.add("grade-c");
@@ -86,7 +90,7 @@ function render() {
 
   totalStudents.textContent = students.length;
 
-  // Average Score
+  // Calculates average and top student.
 
   const total = students.reduce((sum, student) => {
     return sum + student.score;
@@ -129,13 +133,13 @@ addBtn.onclick = () => {
     addBtn.textContent = "Add Student";
   }
 
-  // Highest to Lowest
+  // Sorts Highest to Lowest
 
   students.sort((a, b) => b.score - a.score);
 
   studentName.value = "";
   studentScore.value = "";
-
+// Updates the page after changes.
   render();
 };
 
@@ -143,6 +147,7 @@ addBtn.onclick = () => {
 
 studentTable.onclick = (event) => {
   if (event.target.classList.contains("delete")) {
+    // Deletes a student.
     students.splice(event.target.dataset.index, 1);
 
     render();

@@ -36,16 +36,17 @@ function render() {
     return;
   }
 
-  // Filter Transactions
+  // Filter Transactions i.e. Shows All/Income/Expense.
 
   const view =
     filter.value === "All"
       ? entries
       : entries.filter((entry) => entry.type === filter.value);
 
-  // Display Each Transaction
+  // Display Each Transaction or Loops through transactions.
 
   view.forEach((entry, index) => {
+    // Builds list items.
     const li = document.createElement("li");
 
     li.className = entry.type;
@@ -75,7 +76,7 @@ function summary() {
   const totalIncome = entries
 
     .filter((entry) => entry.type === "Income")
-
+// Calculates income, expense and balance.
     .reduce((sum, entry) => sum + entry.amount, 0);
 
   const totalExpense = entries
@@ -91,7 +92,7 @@ function summary() {
   balance.textContent = `Balance : ₦${totalIncome - totalExpense}`;
 }
 
-// Display Category Breakdown
+// Display Category Breakdown 0r Groups totals by category.
 function categoryBreakdown() {
   categories.innerHTML = "";
 
@@ -121,7 +122,7 @@ add.onclick = () => {
 
     return;
   }
-
+// Adds a transaction.
   entries.push({
     desc: desc.value,
 
@@ -146,12 +147,13 @@ filter.onchange = render;
 
 list.onclick = (event) => {
   if (event.target.tagName === "BUTTON") {
+    // Deletes a transaction.
     entries.splice(event.target.dataset.index, 1);
 
     render();
   }
 };
 
-// Initial Display
+// Initial Display or Refreshes the page.
 
 render();
