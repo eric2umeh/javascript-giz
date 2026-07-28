@@ -3,27 +3,21 @@ const cors = require("cors");
 
 const app = express();
 
-const PORT = 3001;
-
 app.use(cors());
 app.use(express.json());
 
-// In-memory database
+const PORT = 3001;
+
+// In-memory storage
 let transactions = [];
 
-// GET ALL TRANSACTIONS
-
+// Get All Transactions
 app.get("/transactions", (req, res) => {
-  console.log("GET /transactions");
   res.json(transactions);
 });
 
-// ADD TRANSACTION
-
+// Add Transaction
 app.post("/transactions", (req, res) => {
-  console.log("POST /transactions");
-  console.log(req.body);
-
   const { description, amount, type, category } = req.body;
 
   if (!description || !amount || !type) {
@@ -45,15 +39,51 @@ app.post("/transactions", (req, res) => {
   res.status(201).json(transaction);
 });
 
-// DELETE TRANSACTION
+// Update Transaction
+app.put("/transactions/:id", (req, res) => {
+  const id = Number(req.params.id);
 
+  const transaction = transactions.find((item) => item.id === id);
+
+  if (!transaction) {
+    return res.status(404).json({
+      message: "Transaction not found",
+    });
+  }
+
+  transaction.description = req.body.description;
+  transaction.amount = Number(req.body.amount);
+  transaction.type = req.body.type;
+  transaction.category = req.body.category;
+
+  res.json(transaction);
+});
+
+// Delete Transaction
 app.delete("/transactions/:id", (req, res) => {
   const id = Number(req.params.id);
 
-  transactions = transactions.filter((t) => t.id !== id);
+  transactions = transactions.filter((item) => item.id !== id);
 
   res.json({
-    message: "Deleted successfully",
+    message: "Transaction deleted",
+  });
+});
+
+// Get Summary
+app.get("/summary", (req, res) => {
+  const income = transactions
+    .filter((item) => item.type === "Income")
+    .reduce((total, item) => total + item.amount, 0);
+
+  const expense = transactions
+    .filter((item) => item.type === "Expense")
+    .reduce((total, item) => total + item.amount, 0);
+
+  res.json({
+    income,
+    expense,
+    balance: income - expense,
   });
 });
 
