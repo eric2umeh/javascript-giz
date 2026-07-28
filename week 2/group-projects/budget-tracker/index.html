@@ -1,62 +1,54 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Tracker</title>
-
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <h2>Budget Tracker</h2>
+    <main class="app">
+      <header>
+        <p class="eyebrow">Personal finance</p>
+        <h1>Budget Tracker</h1>
+        <p class="intro">Keep an eye on what comes in, what goes out, and where it goes.</p>
+      </header>
 
-    <!-- Add Transaction -->
+      <section class="card" aria-labelledby="add-title">
+        <h2 id="add-title">Add a transaction</h2>
+        <div class="form-grid">
+          <input id="desc" placeholder="e.g. Grocery shopping" aria-label="Description" />
+          <input id="amount" type="number" placeholder="Amount" aria-label="Amount" />
+          <select id="category" aria-label="Category">
+            <option>Food</option><option>Transport</option><option>Shopping</option>
+            <option>Salary</option><option>Rent</option><option>Other</option>
+          </select>
+          <select id="type" aria-label="Transaction type"><option>Income</option><option>Expense</option></select>
+          <button id="add">Add transaction</button>
+        </div>
+      </section>
 
-    <input id="desc" placeholder="Description" />
+      <section class="summary" aria-label="Budget summary">
+        <article id="income"></article>
+        <article id="expense"></article>
+        <article id="balance"></article>
+      </section>
 
-    <input id="amount" type="number" placeholder="Amount" />
-
-    <select id="category">
-      <option>Food</option>
-      <option>Transport</option>
-      <option>Shopping</option>
-      <option>Salary</option>
-      <option>Rent</option>
-      <option>Other</option>
-    </select>
-
-    <select id="type">
-      <option>Income</option>
-      <option>Expense</option>
-    </select>
-
-    <button id="add">Add</button>
-
-    <br /><br />
-
-    <!-- Filter -->
-
-    <select id="filter">
-      <option>All</option>
-
-      <option>Income</option>
-
-      <option>Expense</option>
-    </select>
-
-    <h3 id="income"></h3>
-
-    <h3 id="expense"></h3>
-
-    <h3 id="balance"></h3>
-
-    <h3>Category Breakdown</h3>
-
-    <div id="categories"></div>
-
-    <hr />
-
-    <ul id="list"></ul>
+      <section class="details">
+        <div class="card breakdown">
+          <h2>Category breakdown</h2>
+          <div id="categories"></div>
+        </div>
+        <div class="card transactions">
+          <div class="section-heading">
+            <h2>Transactions</h2>
+            <select id="filter" aria-label="Filter transactions"><option>All</option><option>Income</option><option>Expense</option></select>
+          </div>
+          <ul id="list"></ul>
+        </div>
+      </section>
+    </main>
 
     <script src="script.js"></script>
   </body>
