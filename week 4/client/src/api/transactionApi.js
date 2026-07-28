@@ -1,3 +1,4 @@
+// Base URL for our Node.js Backend
 const API_URL = "http://localhost:3001";
 
 // Get All Transactions
