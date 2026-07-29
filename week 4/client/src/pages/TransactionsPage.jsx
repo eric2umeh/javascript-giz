@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/giz-logo.png";
 
 import {
   getTransactions,
@@ -8,12 +9,13 @@ import {
   getSummary,
 } from "../api/transactionApi";
 
-import logo from "../assets/giz-logo.png";
-
-// Transactions Page
 function TransactionsPage() {
+
   // Store all transactions
   const [transactions, setTransactions] = useState([]);
+
+  // Store filtered transactions
+  const [filter, setFilter] = useState("All");
 
   // Store summary
   const [summary, setSummary] = useState({
@@ -22,244 +24,371 @@ function TransactionsPage() {
     balance: 0,
   });
 
-  // Store current filter
-  const [filter, setFilter] = useState("All");
-
-  // Store loading state
-  const [loading, setLoading] = useState(true);
-
-  // Store edit id
-  const [editId, setEditId] = useState(null);
+  // Store editing id
+  const [editingId, setEditingId] = useState(null);
 
   // Store edit form
-  const [editData, setEditData] = useState({
+  const [editForm, setEditForm] = useState({
     description: "",
     amount: "",
     category: "",
-    type: "Income",
+    type: "",
   });
 
   // Load page
   useEffect(() => {
-    loadTransactions();
-    loadSummary();
+    loadData();
   }, []);
 
-  // Load Transactions
-  async function loadTransactions() {
-    try {
-      const data = await getTransactions();
-      setTransactions(data);
-    } catch (error) {
-      console.log(error);
-    }
+  // Load transactions and summary
+  async function loadData() {
 
-    setLoading(false);
+    const data = await getTransactions();
+    setTransactions(data);
+
+    const totals = await getSummary();
+    setSummary(totals);
+
   }
 
-  // Load Summary
-  async function loadSummary() {
-    try {
-      const data = await getSummary();
-      setSummary(data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  // Delete Transaction
+  // Delete transaction
   async function handleDelete(id) {
-    if (!window.confirm("Delete this transaction?")) return;
+
+    const answer = window.confirm(
+      "Delete this transaction?"
+    );
+
+    if (!answer) return;
 
     await deleteTransaction(id);
 
-    loadTransactions();
-    loadSummary();
+    loadData();
+
   }
 
-  // Start Editing
-  function handleEdit(transaction) {
-    setEditId(transaction.id);
+  // Start editing
+  function startEdit(transaction) {
 
-    setEditData({
+    setEditingId(transaction.id);
+
+    setEditForm({
       description: transaction.description,
       amount: transaction.amount,
       category: transaction.category,
       type: transaction.type,
     });
+
   }
 
-  // Update Edit Form
-  function handleChange(event) {
-    setEditData({
-      ...editData,
+  // Cancel edit
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  // Handle edit input
+  function handleEditChange(event) {
+
+    setEditForm({
+      ...editForm,
       [event.target.name]: event.target.value,
     });
+
   }
 
-  // Save Edited Transaction
-  async function handleSave(id) {
-    await updateTransaction(id, editData);
+  // Save edit
+  async function saveEdit(id) {
 
-    setEditId(null);
+    await updateTransaction(id, {
+      ...editForm,
+      amount: Number(editForm.amount),
+    });
 
-    loadTransactions();
-    loadSummary();
+    setEditingId(null);
+
+    loadData();
+
   }
 
-  // Cancel Edit
-  function handleCancel() {
-    setEditId(null);
-  }
-
-  // Filter Transactions
+  // Filter transactions
   const filteredTransactions =
     filter === "All"
       ? transactions
-      : transactions.filter((transaction) => transaction.type === filter);
+      : transactions.filter(
+          (item) => item.type === filter
+        );
 
   return (
     <div className="page">
+
       <div className="container">
-        <img src={logo} alt="GIZ Logo" className="logo" />
+        <img
+          src={logo}
+          alt="GIZ Logo"
+          className="logo"
+        />
+        <div className="page-header">
 
-        <h1>Transactions</h1>
+          <div>
 
-        <p className="subtitle">View and manage your transactions.</p>
+            <p className="eyebrow">
+              PERSONAL FINANCE
+            </p>
+
+            <h1>Transactions</h1>
+
+            <p className="subtitle">
+              View, edit and delete your transactions.
+            </p>
+
+          </div>
+
+          <Link
+            to="/"
+            className="primary-button"
+          >
+            + Add Transaction
+          </Link>
+
+        </div>
 
         {/* Summary */}
 
-        <div className="summary">
-          <div className="card income">
-            <h3>Income</h3>
+        <div className="summary-grid">
+
+          <div className="summary-card income">
+
+            <h3>Total Income</h3>
+
             <h2>₦{summary.income}</h2>
+
           </div>
 
-          <div className="card expense">
-            <h3>Expense</h3>
+          <div className="summary-card expense">
+
+            <h3>Total Expense</h3>
+
             <h2>₦{summary.expense}</h2>
+
           </div>
 
-          <div className="card balance">
+          <div className="summary-card balance">
+
             <h3>Balance</h3>
+
             <h2>₦{summary.balance}</h2>
+
           </div>
+
         </div>
 
-        {/* Filter Buttons */}
+        {/* Table Card */}
 
-        <div className="filters">
-          <button onClick={() => setFilter("All")}>All</button>
+        <div className="card">
 
-          <button onClick={() => setFilter("Income")}>Income</button>
+          <div className="section-header">
 
-          <button onClick={() => setFilter("Expense")}>Expense</button>
-        </div>
+            <h2>Transaction List</h2>
 
-        {/* Transaction List */}
+            <select
+              value={filter}
+              onChange={(event) =>
+                setFilter(event.target.value)
+              }
+            >
+              <option>All</option>
+              <option>Income</option>
+              <option>Expense</option>
+            </select>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : filteredTransactions.length === 0 ? (
-          <p>No Transactions Found.</p>
-        ) : (
-          filteredTransactions.map((transaction) => (
-            <div key={transaction.id} className="transaction-card">
-              {editId === transaction.id ? (
-                <>
-                  <input
-                    name="description"
-                    value={editData.description}
-                    onChange={handleChange}
-                  />
+          </div>
 
-                  <input
-                    type="number"
-                    name="amount"
-                    value={editData.amount}
-                    onChange={handleChange}
-                  />
+          <table className="transaction-table">
 
-                  <input
-                    name="category"
-                    value={editData.category}
-                    onChange={handleChange}
-                  />
+            <thead>
 
-                  <select
-                    name="type"
-                    value={editData.type}
-                    onChange={handleChange}
+              <tr>
+
+                <th>Description</th>
+
+                <th>Category</th>
+
+                <th>Type</th>
+
+                <th>Amount</th>
+
+                <th>Actions</th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              {filteredTransactions.length === 0 ? (
+
+                <tr>
+
+                  <td
+                    colSpan="5"
+                    className="empty-table"
                   >
-                    <option>Income</option>
-                    <option>Expense</option>
-                  </select>
+                    No transactions found.
+                  </td>
 
-                  <div className="actions">
-                    <button
-                      className="save-btn"
-                      onClick={() => handleSave(transaction.id)}
-                    >
-                      Save
-                    </button>
+                </tr>
 
-                    <button className="cancel-btn" onClick={handleCancel}>
-                      Cancel
-                    </button>
-                  </div>
-                </>
               ) : (
-                <>
-                  <h3>{transaction.description}</h3>
 
-                  <p>
-                    <strong>Amount:</strong> ₦{transaction.amount}
-                  </p>
+                filteredTransactions.map((item) => (
 
-                  <p>
-                    <strong>Category:</strong> {transaction.category}
-                  </p>
+                  editingId === item.id ?
 
-                  <p>
-                    <strong>Type:</strong>{" "}
-                    <span
-                      className={
-                        transaction.type === "Income"
-                          ? "income-text"
-                          : "expense-text"
-                      }
-                    >
-                      {transaction.type}
-                    </span>
-                  </p>
+                  <tr key={item.id}>
 
-                  <div className="actions">
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEdit(transaction)}
-                    >
-                      Edit
-                    </button>
+                    <td>
 
-                    <button
-                      className="delete-btn"
-                      onClick={() => handleDelete(transaction.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </>
+                      <input
+                        name="description"
+                        value={editForm.description}
+                        onChange={handleEditChange}
+                      />
+
+                    </td>
+
+                    <td>
+
+                      <select
+                        name="category"
+                        value={editForm.category}
+                        onChange={handleEditChange}
+                      >
+
+                        <option>Food</option>
+                        <option>Salary</option>
+                        <option>Transport</option>
+                        <option>Shopping</option>
+                        <option>Health</option>
+                        <option>Bills</option>
+
+                      </select>
+
+                    </td>
+
+                    <td>
+
+                      <select
+                        name="type"
+                        value={editForm.type}
+                        onChange={handleEditChange}
+                      >
+
+                        <option>Income</option>
+                        <option>Expense</option>
+
+                      </select>
+
+                    </td>
+
+                    <td>
+
+                      <input
+                        type="number"
+                        name="amount"
+                        value={editForm.amount}
+                        onChange={handleEditChange}
+                      />
+
+                    </td>
+
+                    <td>
+
+                      <button
+                        className="save-btn"
+                        onClick={() =>
+                          saveEdit(item.id)
+                        }
+                      >
+                        Save
+                      </button>
+
+                      <button
+                        className="cancel-btn"
+                        onClick={cancelEdit}
+                      >
+                        Cancel
+                      </button>
+
+                    </td>
+
+                  </tr>
+
+                  :
+
+                  <tr key={item.id}>
+
+                    <td>{item.description}</td>
+
+                    <td>{item.category}</td>
+
+                    <td>
+
+                      <span
+                        className={
+                          item.type === "Income"
+                            ? "badge income-badge"
+                            : "badge expense-badge"
+                        }
+                      >
+                        {item.type}
+                      </span>
+
+                    </td>
+
+                    <td>
+
+                      ₦{item.amount}
+
+                    </td>
+
+                    <td>
+
+                      <button
+                        className="edit-btn"
+                        onClick={() =>
+                          startEdit(item)
+                        }
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="delete-btn"
+                        onClick={() =>
+                          handleDelete(item.id)
+                        }
+                      >
+                        Delete
+                      </button>
+
+                    </td>
+
+                  </tr>
+
+                ))
+
               )}
-            </div>
-          ))
-        )}
 
-        <Link to="/" className="link-button">
-          ← Add New Transaction
-        </Link>
+            </tbody>
+
+          </table>
+
+        </div>
+
       </div>
+
     </div>
   );
+
 }
 
 export default TransactionsPage;
