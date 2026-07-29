@@ -1,204 +1,213 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/giz-logo.png";
+
 import {
   createTransaction,
+  getTransactions,
   getSummary,
 } from "../api/transactionApi";
 
-import logo from "../assets/giz-logo.png";
-
-// Home Page
 function AddTransaction() {
-  // Form State
-  const [formData, setFormData] = useState({
+  // Store form values
+  const [form, setForm] = useState({
     description: "",
     amount: "",
-    category: "",
+    category: "Food",
     type: "Income",
   });
 
-  // Summary State
+  // Store transactions
+  const [transactions, setTransactions] = useState([]);
+
+  // Store summary
   const [summary, setSummary] = useState({
     income: 0,
     expense: 0,
     balance: 0,
   });
 
-  // Loading State
-  const [loading, setLoading] = useState(false);
-
-  // Load Summary
+  // Load everything
   useEffect(() => {
-    loadSummary();
+    loadData();
   }, []);
 
-  // Get Summary From API
-  async function loadSummary() {
-    try {
-      const data = await getSummary();
-      setSummary(data);
-    } catch (error) {
-      console.log(error);
-    }
+  // Get transactions and summary
+  async function loadData() {
+    const list = await getTransactions();
+    setTransactions(list);
+
+    const totals = await getSummary();
+    setSummary(totals);
   }
 
-  // Update Input Fields
+  // Handle typing
   function handleChange(event) {
-    setFormData({
-      ...formData,
+    setForm({
+      ...form,
       [event.target.name]: event.target.value,
     });
   }
 
-  // Add Transaction
+  // Add transaction
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (
-      formData.description.trim() === "" ||
-      formData.amount === "" ||
-      formData.category.trim() === ""
-    ) {
+    if (!form.description || !form.amount) {
       alert("Please complete all fields.");
       return;
     }
 
-    setLoading(true);
+    await createTransaction({
+      ...form,
+      amount: Number(form.amount),
+    });
 
-    try {
-      await createTransaction(formData);
+    setForm({
+      description: "",
+      amount: "",
+      category: "Food",
+      type: "Income",
+    });
 
-      alert("Transaction Added Successfully!");
-
-      setFormData({
-        description: "",
-        amount: "",
-        category: "",
-        type: "Income",
-      });
-
-      loadSummary();
-    } catch (error) {
-      alert("Unable to save transaction.");
-      console.log(error);
-    }
-
-    setLoading(false);
+    loadData();
   }
+
+  // Category Breakdown
+  const categoryTotals = {};
+
+  transactions.forEach((item) => {
+    categoryTotals[item.category] =
+      (categoryTotals[item.category] || 0) + item.amount;
+  });
 
   return (
     <div className="page">
-
       <div className="container">
+        <img src={logo} alt="GIZ Logo" className="logo" />
+        <p className="eyebrow">PERSONAL FINANCE</p>
 
-        <img
-          src={logo}
-          alt="GIZ Logo"
-          className="logo"
-        />
-
-        <h1>Personal Budget Tracker</h1>
+        <h1>Budget Tracker</h1>
 
         <p className="subtitle">
-          Track your income and expenses easily.
+          Keep an eye on what comes in, what goes out, and where it goes.
         </p>
 
-        {/* Summary Cards */}
+        {/* Form Card */}
 
-        <div className="summary">
+        <div className="card">
+          <h2>Add a transaction</h2>
 
-          <div className="card income">
+          <form className="transaction-form" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="description"
+              placeholder="e.g. Grocery Shopping"
+              value={form.description}
+              onChange={handleChange}
+            />
 
+            <input
+              type="number"
+              name="amount"
+              placeholder="Amount"
+              value={form.amount}
+              onChange={handleChange}
+            />
+
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+            >
+              <option>Food</option>
+              <option>Salary</option>
+              <option>Transport</option>
+              <option>Shopping</option>
+              <option>Health</option>
+              <option>Bills</option>
+            </select>
+
+            <select name="type" value={form.type} onChange={handleChange}>
+              <option>Income</option>
+              <option>Expense</option>
+            </select>
+
+            <button>Add Transaction</button>
+          </form>
+        </div>
+
+        {/* Summary */}
+
+        <div className="summary-grid">
+          <div className="summary-card income">
             <h3>Income</h3>
 
             <h2>₦{summary.income}</h2>
-
           </div>
 
-          <div className="card expense">
-
+          <div className="summary-card expense">
             <h3>Expense</h3>
 
             <h2>₦{summary.expense}</h2>
-
           </div>
 
-          <div className="card balance">
-
+          <div className="summary-card balance">
             <h3>Balance</h3>
 
             <h2>₦{summary.balance}</h2>
-
           </div>
-
         </div>
 
-        {/* Transaction Form */}
+        {/* Bottom Section */}
 
-        <form
-          className="form"
-          onSubmit={handleSubmit}
-        >
+        <div className="bottom-grid">
+          <div className="card">
+            <h2>Category Breakdown</h2>
 
-          <label>Description</label>
+            {Object.keys(categoryTotals).length === 0 ? (
+              <p>No data yet.</p>
+            ) : (
+              Object.entries(categoryTotals).map(([category, total]) => (
+                <div key={category} className="category-row">
+                  <span>{category}</span>
 
-          <input
-            type="text"
-            name="description"
-            placeholder="Enter description"
-            value={formData.description}
-            onChange={handleChange}
-          />
+                  <strong>₦{total}</strong>
+                </div>
+              ))
+            )}
+          </div>
 
-          <label>Amount</label>
+          <div className="card">
+            <div className="section-header">
+              <h2>Recent Transactions</h2>
 
-          <input
-            type="number"
-            name="amount"
-            placeholder="Enter amount"
-            value={formData.amount}
-            onChange={handleChange}
-          />
+              <Link to="/transactions" className="view-link">
+                View All →
+              </Link>
+            </div>
 
-          <label>Category</label>
+            {transactions.length === 0 ? (
+              <p className="empty">No transactions yet.</p>
+            ) : (
+              transactions
+                .slice(-5)
+                .reverse()
+                .map((item) => (
+                  <div key={item.id} className="recent-item">
+                    <div>
+                      <strong>{item.description}</strong>
 
-          <input
-            type="text"
-            name="category"
-            placeholder="Food, Salary, Transport..."
-            value={formData.category}
-            onChange={handleChange}
-          />
+                      <p>{item.category}</p>
+                    </div>
 
-          <label>Transaction Type</label>
-
-          <select
-            name="type"
-            value={formData.type}
-            onChange={handleChange}
-          >
-            <option>Income</option>
-            <option>Expense</option>
-          </select>
-
-          <button
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Saving..." : "Add Transaction"}
-          </button>
-
-        </form>
-
-        <Link
-          to="/transactions"
-          className="link-button"
-        >
-          View Transactions →
-        </Link>
-
+                    <strong>₦{item.amount}</strong>
+                  </div>
+                ))
+            )}
+          </div>
+        </div>
       </div>
-
     </div>
   );
 }
