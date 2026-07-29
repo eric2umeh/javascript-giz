@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3001";
+const API_URL = "http://localhost:3002";
 
 // Get All Students
 export async function getStudents() {
