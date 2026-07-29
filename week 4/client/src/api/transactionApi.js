@@ -3,11 +3,11 @@ const API_URL = "http://localhost:3001";
 // Get All Transactions
 export async function getTransactions() {
   const response = await fetch(`${API_URL}/transactions`);
-  return await response.json();
+  return response.json();
 }
 
-// Add Transaction
-export async function addTransaction(transaction) {
+// Create Transaction
+export async function createTransaction(transaction) {
   const response = await fetch(`${API_URL}/transactions`, {
     method: "POST",
     headers: {
@@ -16,7 +16,7 @@ export async function addTransaction(transaction) {
     body: JSON.stringify(transaction),
   });
 
-  return await response.json();
+  return response.json();
 }
 
 // Update Transaction
@@ -29,18 +29,20 @@ export async function updateTransaction(id, transaction) {
     body: JSON.stringify(transaction),
   });
 
-  return await response.json();
+  return response.json();
 }
 
 // Delete Transaction
 export async function deleteTransaction(id) {
-  await fetch(`${API_URL}/transactions/${id}`, {
+  const response = await fetch(`${API_URL}/transactions/${id}`, {
     method: "DELETE",
   });
+
+  return response.json();
 }
 
 // Get Summary
 export async function getSummary() {
   const response = await fetch(`${API_URL}/summary`);
-  return await response.json();
+  return response.json();
 }
